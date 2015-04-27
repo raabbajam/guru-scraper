@@ -1,0 +1,22 @@
+{
+  "name": "guru-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for sites",
+  "main": "index.coffee",
+  "scripts": {
+    "test": "mocha tests/**/**Spec.coffee"
+  },
+  "author": "Raabb Ajam (rabbajam@gmail.com)",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^2.9.24",
+    "chai": "^2.2.0",
+    "cheerio": "^0.19.0",
+    "kue": "^0.8.12",
+    "lodash": "^3.7.0",
+    "request": "^2.55.0",
+    "waterline": "^0.10.21",
+    "waterline-mysql": "^0.6.0",
+    "waterline-redis": "0.0.0"
+  }
+}
