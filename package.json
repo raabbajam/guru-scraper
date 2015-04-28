@@ -4,7 +4,7 @@
   "description": "Scraper for sites",
   "main": "index.coffee",
   "scripts": {
-    "test": "mocha tests/**/**Spec.coffee"
+    "test": "mocha tests/**/**Spec.coffee --compilers coffee:coffee-script/register"
   },
   "author": "Raabb Ajam (rabbajam@gmail.com)",
   "license": "ISC",
@@ -15,6 +15,7 @@
     "kue": "^0.8.12",
     "lodash": "^3.7.0",
     "request": "^2.55.0",
+    "rewire": "^2.3.3",
     "waterline": "^0.10.21",
     "waterline-mysql": "^0.6.0",
     "waterline-redis": "0.0.0"
