@@ -7,9 +7,10 @@
     "start": "DEBUG=raabbajam:* coffee index.coffee",
     "test": "mocha tests/**/**Spec.coffee --compilers coffee:coffee-script/register",
     "worker": "DEBUG=raabbajam:* coffee worker.coffee",
+    "pm2:worker": "DEBUG=raabbajam:* pm2 start worker.coffee --interpreter ./node_modules/.bin/coffee",
     "start-local": "CONFIG=test DEBUG=raabbajam:* coffee index.coffee",
     "worker-local": "CONFIG=test DEBUG=raabbajam:* coffee worker.coffee",
-    "s:all": "pssh -l root -o /tmp/out -h ./docs/servers.txt"
+    "s:all": "pssh -l root -o /tmp/out -t 0 -h ./docs/servers.txt"
   },
   "author": "Raabb Ajam (rabbajam@gmail.com)",
   "license": "ISC",
@@ -17,6 +18,7 @@
     "bluebird": "^2.9.24",
     "chai": "^2.2.0",
     "cheerio": "^0.19.0",
+    "coffee-script": "1.9.2",
     "debug": "^2.1.3",
     "kue": "^0.8.12",
     "lodash": "^3.7.0",

@@ -1,3 +1,4 @@
+debug = require("debug")("raabbajam:scrape:libs:kue")
 Kue = require "kue"
 config = require "../docs/locals"
 Promise = require "bluebird"
@@ -32,7 +33,7 @@ listen = (port) ->
   Kue.app.listen(port)
 
 process.once 'SIGTERM', (sig) ->
-  queue.shutdown 5000, (err) ->
+  queue.shutdown (err) ->
     debug 'Kue is shut down. ', err || ''
     process.exit( 0 )
 process.once 'uncaughtException', (err) ->
