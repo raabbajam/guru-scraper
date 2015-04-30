@@ -4,7 +4,10 @@
   "description": "Scraper for sites",
   "main": "index.coffee",
   "scripts": {
-    "test": "mocha tests/**/**Spec.coffee --compilers coffee:coffee-script/register"
+    "start": "DEBUG=raabbajam:* coffee index.coffee",
+    "test": "mocha tests/**/**Spec.coffee --compilers coffee:coffee-script/register",
+    "worker": "DEBUG=raabbajam:* coffee worker.coffee",
+    "s:all": "pssh -l root -o /tmp/out -h ./docs/servers.txt"
   },
   "author": "Raabb Ajam (rabbajam@gmail.com)",
   "license": "ISC",
@@ -14,6 +17,8 @@
     "cheerio": "^0.19.0",
     "kue": "^0.8.12",
     "lodash": "^3.7.0",
+    "nohm": "^0.9.6",
+    "redis": "^0.12.1",
     "request": "^2.55.0",
     "rewire": "^2.3.3",
     "waterline": "^0.10.21",
