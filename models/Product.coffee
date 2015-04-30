@@ -1,9 +1,9 @@
 nohm = require('nohm').Nohm
-debug = require 'debug' 'raabbajam:models:product'
+debug = require('debug') 'raabbajam:models:product'
 Promise = require 'bluebird'
 redisClient = require './redisClient'
 nohm.setClient redisClient
-# initialized = false;
+initialized = false;
 productProperties =
   properties:
     url:
@@ -134,7 +134,7 @@ Product.check = check;
 Product.destroy = destroy;
 Product.destroyAll = destroyAll;
 Product.init = init;###
-insert (data) ->
+insert = (data) ->
   new Promise (resolve, reject) ->
     product = nohm.factory 'Product', (err) ->
       if (err)
@@ -142,7 +142,7 @@ insert (data) ->
       product.p data
       product.save (err) ->
         if err
-          if err === 'invalid'
+          if err is 'invalid'
             debug 'properties were invalid: ', product.errors
             err = new Error 'properties were invalid'
             err.errors = product.errors
@@ -151,7 +151,18 @@ insert (data) ->
           return reject err
         debug 'Saved product!'
         return resolve()
+init = ->
+  debug 'Product init..'
+  new Promise (resolve, reject) ->
+    if (initialized)
+      return resolve();
+    initialized = true;
+    redisClient.on 'ready', ->
+      debug('Product initialized')
+      nohm.setClient redisClient
+      return resolve()
 
-Product:
+Product =
   insert: insert
+  init: init
 module.exports = Product;
