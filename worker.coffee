@@ -1,5 +1,5 @@
 debug = require("debug")("raabbajam:scrape:worker")
-job = require "./services/job"
+Job = require "./services/job"
 getCategories = require "./services/getCategories"
 getSubCategories = require "./services/getSubCategories"
 getProductList = require "./services/getProductList"
@@ -11,7 +11,7 @@ concurrency = 3
 Product.init()
   .then ->
     debug 'Listen to jobs'
-    job.process "getCategories", concurrency, (job, done) ->
+    Job.process "getCategories", concurrency, (job, done) ->
       debug "starting getCategories for url %s", job.data.url
       options =
         url: job.data.url
@@ -21,9 +21,9 @@ Product.init()
           urls.forEach (url) ->
             data =
               url: url
-            job.insert("getSubCategories", data)
+            Job.insert("getSubCategories", data)
 
-    job.process "getSubCategories", concurrency, (job, done) ->
+    Job.process "getSubCategories", concurrency, (job, done) ->
       debug "starting getSubCategories for url %s", job.data.url
       options =
         url: job.data.url
@@ -33,9 +33,9 @@ Product.init()
           urls.forEach (url) ->
             data =
               url: url
-            job.insert "getProductList", data
+            Job.insert "getProductList", data
 
-    job.process "getProductList", concurrency, (job, done) ->
+    Job.process "getProductList", concurrency, (job, done) ->
       debug "starting getProductList for url %s", job.data.url
       options =
         url: job.data.url
@@ -45,9 +45,9 @@ Product.init()
           urls.forEach (url) ->
             data =
               url: url
-            job.insert "getProductDetail", data
+            Job.insert "getProductDetail", data
 
-    job.process "getProductDetail", concurrency, (job, done) ->
+    Job.process "getProductDetail", concurrency, (job, done) ->
       debug "starting getProductDetail for url %s", job.data.url
       options =
         url: job.data.url
