@@ -1,6 +1,6 @@
 [{
-        "name": "getProductDetail",
+        "name": "getCategories",
         "data": {
-          "url": "Lasko/Lasko-18inch-Stand-Fan-White/1850W.pcrp?catId=101080"
+          "url": "Heating-and-Cooling/170.pcrc"
         }
 }]

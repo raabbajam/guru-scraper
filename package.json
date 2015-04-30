@@ -5,6 +5,7 @@
   "main": "index.coffee",
   "scripts": {
     "start": "DEBUG=raabbajam:* coffee index.coffee",
+    "server": "DEBUG=raabbajam:* coffee server.coffee",
     "test": "mocha tests/**/**Spec.coffee --compilers coffee:coffee-script/register",
     "worker": "DEBUG=raabbajam:* coffee worker.coffee",
     "pm2:worker": "DEBUG=raabbajam:* pm2 start worker.coffee --interpreter ./node_modules/.bin/coffee",
