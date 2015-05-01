@@ -22,6 +22,7 @@ Product.init()
             data =
               url: url
             Job.insert("getSubCategories", data)
+            done()
 
     Job.process "getSubCategories", concurrency, (job, done) ->
       debug "starting getSubCategories for url %s", job.data.url
@@ -34,6 +35,7 @@ Product.init()
             data =
               url: url
             Job.insert "getProductList", data
+            done()
 
     Job.process "getProductList", concurrency, (job, done) ->
       debug "starting getProductList for url %s", job.data.url
@@ -46,6 +48,7 @@ Product.init()
             data =
               url: url
             Job.insert "getProductDetail", data
+            done()
 
     Job.process "getProductDetail", concurrency, (job, done) ->
       debug "starting getProductDetail for url %s", job.data.url
@@ -58,3 +61,6 @@ Product.init()
             url: job.data.url
             data: data
           Product.insert(product)
+          done()
+        .catch (err) ->
+          done err
