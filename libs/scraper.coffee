@@ -3,7 +3,7 @@ Promise = require 'bluebird'
 cheerio = require 'cheerio'
 
 get$ = (options) ->
-  options.url = 'http://www.pcrichard.com/' + options.url
+  options.url = 'http://www.pcrichard.com/' + options.url.replace(/^\//, '')
   console.log options
   return new Promise((resolve, reject) ->
     request options, (err, res, body) ->

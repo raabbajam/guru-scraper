@@ -9,9 +9,12 @@ queue = Kue.createQueue
     host: config.redis.host
 addTask = (task, data) ->
   new Promise (resolve, reject) ->
+    opts =
+      delay: 60*1000
+      type: 'fixed'
     job = queue.create task, data
-    .backoff true
-    .attempts 5
+    .backoff opts
+    .attempts 2
     .removeOnComplete true
     .save (err) ->
       if err
@@ -20,7 +23,7 @@ addTask = (task, data) ->
         debug 'COMPLETE!!'
         return
       .on 'failed attempt', (err, times) ->
-        debug('FAILED ATTEMPT!!! %d times, will try again', times, err)
+        debug('FAILED ATTEMPT!!! %s times, will try again', times, err)
         return reject err
       .on 'failed', (err) ->
         debug 'FAILED!!! max attempts reached, will not try again', times, err
@@ -54,8 +57,9 @@ queue.on 'error', (err) ->
   debug 'Oops... ', err
 .on 'job complete', (id, result) ->
   debug 'JOB COMPLETE!! id %s, %s', id, result
-.on 'job failed attempt', (err, times) ->
-  debug 'FAILED ATTEMPT!!! %d times, will try again', times, err
+.on 'job failed attempt', (times, err) ->
+  debug 'FAILED ATTEMPT!!! %s times, will try again', times, err
+  debug err.stack
 .on 'job failed', (err) ->
   debug 'FAILED!!! max attempts reached, will not try again', err
 queue.active (err, ids) ->
