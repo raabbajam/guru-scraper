@@ -3,8 +3,7 @@ Promise = require 'bluebird'
 cheerio = require 'cheerio'
 
 get$ = (options) ->
-  options.url = 'http://www.pcrichard.com/' + options.url.replace(/^\//, '')
-  console.log options
+  options = scraper.mapOptions?(options) or options
   return new Promise((resolve, reject) ->
     request options, (err, res, body) ->
       if err

@@ -1,6 +1,43 @@
-scraper = require '../libs/scraper'
+scraper = require '../../../libs/scraper'
+Promise = require 'bluebird'
+urlParser = require('url').parse
+scraper.mapOptions = (options) ->
+  options.url = 'http://www.pcrichard.com/' + options.url.replace(/^\//, '')
+
+getCategories = (options) ->
+  scraper.get$(options)
+    .then(($) ->
+      arr = []
+      $('#content .cats li a').each((i, a) ->
+        arr.push $(a).attr('href')
+      )
+      arr
+    )
+
+getSubCategories = (options) ->
+  scraper.get$(options)
+    .then(($) ->
+      arr = []
+      $('#content .cats li a').each((i, a) ->
+        arr.push $(a).attr('href')
+      )
+      arr
+    )
+
+getProductList = (options) ->
+  options.url += '?pageNum=0&trail=&pageSize=60'
+  scraper.get$(options)
+    .then(($) ->
+      arr = []
+      $('.item-title a').each((i, a) ->
+        arr.push $(a).attr('href')
+      )
+      arr
+    )
+
 parseNum = (text) ->
   +text.replace(/[^\.0-9]/g, '')
+
 parseDetail = ($) ->
   modelNumber = $('.pdp-sku').text().trim().replace /Model:\s/, ''
   url = $('link[rel=canonical]').attr 'href'
@@ -58,7 +95,29 @@ parseDetail = ($) ->
   is_scraped: true
   date_created: ''
   date_updated: ''
-getProductList = (options) ->
+
+getProductDetail = (options) ->
   scraper.get$(options)
     .then(parseDetail)
-module.exports = getProductList
+
+get = (options) ->
+  url = options.url
+  urlParts = urlParser url
+  if /\.pcrp$/.test urlParts.pathname
+    return getProductDetail options
+  if /\.pcrc$/.test urlParts.pathname
+    number = urlParts.pathname.match(/(\d+)\.pcrc$/)?[1].length
+    if 0 < number <= 3
+      return getCategories options
+    if number is 4
+      return getSubCategories options
+    if 4 < number <= 6
+      return getProductList options
+  else
+    err = new Error('Url is not identified with any task! %s', url)
+    return Promise.reject err
+
+pcrichard =
+  get: get
+
+module.exports = pcrichard

@@ -6,7 +6,7 @@ getProductList = require "./services/getProductList"
 getProductDetail = require "./services/getProductDetail"
 Product = require "./models/Product"
 log = require "./services/log"
-concurrency = 3
+concurrency = 1
 
 Product.init()
   .then ->
@@ -19,7 +19,9 @@ Product.init()
         .then (urls) ->
           debug "getCategories finished, got urls from url %s: %j", job.data.url, urls
           Job.insert("getSubCategories", urls)
-        .then done
+        .then ->
+          debug "Job done"
+          done()
         .catch (err) ->
           log err
           done err
@@ -32,7 +34,9 @@ Product.init()
         .then (urls) ->
           debug "getSubCategories finished, got urls from url %s: %j", job.data.url, urls
           Job.insert("getProductList", urls)
-        .then done
+        .then ->
+          debug "Job done"
+          done()
         .catch (err) ->
           log err
           done err
@@ -45,7 +49,9 @@ Product.init()
         .then (urls) ->
           debug "getProductList finished, got urls from url %s: %j", job.data.url, urls
           Job.insert("getProductDetail", urls)
-        .then done
+          debug "Job done"
+        .then ->
+          done()
         .catch (err) ->
           log err
           done err
@@ -61,7 +67,9 @@ Product.init()
             url: job.data.url
             data: data
           Product.insert(product)
-        .then done
+        .then ->
+          debug "Job done"
+          done()
         .catch (err) ->
           log err
           done err

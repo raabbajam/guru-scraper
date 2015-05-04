@@ -16,49 +16,20 @@ productProperties =
       type: 'json'
 ProductModel = nohm.model 'Product', productProperties
 
-###function Product(id, data) {
-  return new Promise(function(resolve, reject) {
-    user = nohm.factory('Product', id, function (err) {
-      if (err) return reject(err);
-      user.p('data', data);
-      user.save(function (err) {
-        if (err) {
-          if (err === 'invalid') {
-            debug('properties were invalid: ', user.errors);
-            err = new Error('properties were invalid');
-            err.errors = user.errors;
-          } else {
-            debug(err); // database or unknown error
-          }
-          return reject(err);
-        }
-        debug('Saved user! :-)');
-        return resolve();
-      });
-    });
-  });
-}
-function all() {
-  return new Promise(function(resolve, reject) {
-    ProductModel.find(function (err, ids) {
-      if(err) return reject(err);
-      return resolve(ids);
-    });
-  });
-}
-function get(id, keep) {
-  debug('getting %s',id);
-  return new Promise(function(resolve, reject) {
-    user = nohm.factory('Product', id, function (err) {
-      if (err) return reject(new Error('skip me'));
-      if (!keep && !user.p('data')) {
-        return Product.destroy(id).then(function () {return resolve(0);});
-      }
-      return resolve(user.p('data'));
-    });
-  });
-}
-function check(name) {
+all = ->
+  new Promise (resolve, reject) ->
+    ProductModel.find (err, ids) ->
+      if err
+        return reject err
+      return resolve ids
+get = (id, keep) ->
+  debug 'getting %s', id
+  new Promise (resolve, reject) ->
+    product = nohm.factory 'Product', id, (err) ->
+      if (err)
+        return reject(new Error('skip me'))
+      return resolve(product.p('data'))
+###function check(name) {
   return new Promise(function(resolve, reject) {
     if (name === undefined) return reject(new Error('skip me'));
     user = nohm.factory('Product');
@@ -136,21 +107,19 @@ Product.destroyAll = destroyAll;
 Product.init = init;###
 insert = (data) ->
   new Promise (resolve, reject) ->
-    product = nohm.factory 'Product', (err) ->
-      if (err)
+    product = nohm.factory 'Product'
+    product.p data
+    product.save (err) ->
+      if err
+        if err is 'invalid'
+          debug 'properties were invalid: ', product.errors
+          err = new Error 'properties were invalid'
+          err.errors = product.errors
+        else
+          debug err; # database or unknown error
         return reject err
-      product.p data
-      product.save (err) ->
-        if err
-          if err is 'invalid'
-            debug 'properties were invalid: ', product.errors
-            err = new Error 'properties were invalid'
-            err.errors = product.errors
-          else
-            debug err; # database or unknown error
-          return reject err
-        debug 'Saved product!'
-        return resolve()
+      debug 'Saved product!'
+      return resolve()
 init = ->
   debug 'Product init..'
   new Promise (resolve, reject) ->
@@ -164,5 +133,7 @@ init = ->
 
 Product =
   insert: insert
+  all: all
+  get: get
   init: init
 module.exports = Product;

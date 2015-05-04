@@ -2,6 +2,7 @@ debug = require("debug")("raabbajam:scrape:libs:kue")
 Kue = require "kue"
 config = require "../docs/locals"
 Promise = require "bluebird"
+log = require "../services/log"
 queue = Kue.createQueue
   prefix: config.redis.prefix
   redis:
@@ -23,10 +24,14 @@ addTask = (task, data) ->
         debug 'COMPLETE!!'
         return
       .on 'failed attempt', (err, times) ->
-        debug('FAILED ATTEMPT!!! %s times, will try again', times, err)
+        debug('FAILED ATTEMPT!!! %s times, will try again. Reason: "%s"', times, err)
+        debug(err.stack)
+        log(err.stack)
         return reject err
       .on 'failed', (err) ->
         debug 'FAILED!!! max attempts reached, will not try again', times, err
+        debug(err.stack)
+        log(err.stack)
         return reject err
       return resolve('saved');
     return
