@@ -1,40 +1,45 @@
 scraper = require '../../../libs/scraper'
 Promise = require 'bluebird'
 urlParser = require('url').parse
+job = require '../../job'
 scraper.mapOptions = (options) ->
   options.url = 'http://www.pcrichard.com/' + options.url.replace(/^\//, '')
 
 getCategories = (options) ->
-  scraper.get$(options)
-    .then(($) ->
+  scraper.get$ options
+    .then ($) ->
       arr = []
-      $('#content .cats li a').each((i, a) ->
-        arr.push $(a).attr('href')
-      )
+      $('#content .cats li a').each (i, a) ->
+        arr.push $(a).attr 'href'
       arr
-    )
 
 getSubCategories = (options) ->
-  scraper.get$(options)
-    .then(($) ->
+  scraper.get$ options
+    .then ($) ->
       arr = []
-      $('#content .cats li a').each((i, a) ->
+      $('#content .cats li a').each (i, a) ->
         arr.push $(a).attr('href')
-      )
       arr
-    )
 
 getProductList = (options) ->
-  options.url += '?pageNum=0&trail=&pageSize=60'
-  scraper.get$(options)
-    .then(($) ->
-      arr = []
-      $('.item-title a').each((i, a) ->
-        arr.push $(a).attr('href')
-      )
-      arr
-    )
-
+  new Promise (resolve, reject) ->
+    url = options.url
+    options.url = if /\?/.test(options.url) then options.url else options.url + '?pageNum=0&trail=&pageSize=60'
+    scraper.get$ options
+      .then ($) ->
+        arr = []
+        $('.item-title a').each (i, a) ->
+          arr.push $(a).attr('href')
+        currPage = +$('.listings .paging .active').eq(0).text()
+        if currPage isnt 1
+          return resolve arr
+        lastPage = +$('.listings .paging-next').prev().eq(0).text()
+        if lastPage is 1
+          return resolve arr
+        urls = ("#{url}?pageNum=#{num - 1}&goToPage=#{num}&view=&question=&trail=&pageSize=60&sortBy=" for num in [2..lastPage])
+        job.insert 'pcrichard', urls
+        .then ->
+          return resolve arr
 parseNum = (text) ->
   +text.replace(/[^\.0-9]/g, '')
 
@@ -44,20 +49,20 @@ parseDetail = ($) ->
   urlPart = url.split '/'
   # data = $('.wc-fragment').data()
   productLabel = urlPart[3]
-  brandName = urlPart[4].replace(/-/g, ' ')
+  brandName = urlPart[4].replace /-/g, ' '
   shortFeature = [].slice.call($('.pdp-intro li').map((i, li) ->
       $(li).text()
-    )).join('\n')
+    )).join '\n'
   longFeature = [].slice.call($('.wc-rich-features h3, .wc-rich-features .wc-rich-content-description').map((i, el) ->
-      $el = $(el)
+      $el = $ el
       txt = $el.text()
       if $el[0].name is "h3"
         txt = '-' + txt
       txt
-    )).join('\n')
+    )).join '\n'
   shortDesc = [productLabel, modelNumber, shortFeature].join '\n'
   longDesc = [productLabel, modelNumber, longFeature].join '\n'
-  breadcrumb = $('#breadcrumb p a')
+  breadcrumb = $ '#breadcrumb p a'
   categoryId = +breadcrumb.eq(1).attr('href').match(/(\d+).pcrc/)[1]
   type = breadcrumb.last().text()
   site: 'pcrichard'

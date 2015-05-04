@@ -1,75 +1,33 @@
 debug = require("debug")("raabbajam:scrape:worker")
-Job = require "./services/job"
-getCategories = require "./services/getCategories"
-getSubCategories = require "./services/getSubCategories"
-getProductList = require "./services/getProductList"
-getProductDetail = require "./services/getProductDetail"
 Product = require "./models/Product"
+Job = require "./services/job"
+Store = require "./services/stores"
 log = require "./services/log"
+_ = require "lodash"
+pcrichard = Store 'pcrichard'
 concurrency = 1
 
 Product.init()
   .then ->
     debug 'Listen to jobs'
-    Job.process "getCategories", concurrency, (job, done) ->
-      debug "starting getCategories for url %s", job.data.url
-      options =
-        url: job.data.url
-      getCategories options
-        .then (urls) ->
-          debug "getCategories finished, got urls from url %s: %j", job.data.url, urls
-          Job.insert("getSubCategories", urls)
-        .then ->
-          debug "Job done"
-          done()
-        .catch (err) ->
-          log err
-          done err
 
-    Job.process "getSubCategories", concurrency, (job, done) ->
-      debug "starting getSubCategories for url %s", job.data.url
-      options =
-        url: job.data.url
-      getSubCategories options
-        .then (urls) ->
-          debug "getSubCategories finished, got urls from url %s: %j", job.data.url, urls
-          Job.insert("getProductList", urls)
+    Job.process "pcrichard", concurrency, (job, done) ->
+      debug "starting scrape for pcrichard url %s", job.data.url
+      pcrichard.get job.data
+        .then (output) ->
+          if _.isArray output
+            debug "scraper for pcrichard finished, got urls from url %s: %j", job.data.url, output
+            return Job.insert("pcrichard", output)
+          else
+            debug "scraper for pcrichard finished, got product from url %s: %j", job.data.url, output
+            return Product.insert({
+              url: job.data.url,
+              data: output,
+            })
         .then ->
           debug "Job done"
           done()
         .catch (err) ->
-          log err
-          done err
-
-    Job.process "getProductList", concurrency, (job, done) ->
-      debug "starting getProductList for url %s", job.data.url
-      options =
-        url: job.data.url
-      getProductList options
-        .then (urls) ->
-          debug "getProductList finished, got urls from url %s: %j", job.data.url, urls
-          Job.insert("getProductDetail", urls)
-          debug "Job done"
-        .then ->
-          done()
-        .catch (err) ->
-          log err
-          done err
-
-    Job.process "getProductDetail", concurrency, (job, done) ->
-      debug "starting getProductDetail for url %s", job.data.url
-      options =
-        url: job.data.url
-      getProductDetail options
-        .then (data) ->
-          debug "getProductDetail finished, got data from url %s: %j", job.data.url, data
-          product =
-            url: job.data.url
-            data: data
-          Product.insert(product)
-        .then ->
-          debug "Job done"
-          done()
-        .catch (err) ->
+          debug err.stack
           log err
           done err

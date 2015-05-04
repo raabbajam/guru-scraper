@@ -4,14 +4,16 @@ job = require "./services/job"
 debug = require("debug")("raabbajam:scrape:tasker")
 Promise = require "bluebird"
 taskFile = path.join __dirname, "tasks.json"
-tasks = JSON.parse(fs.readFileSync taskFile)
-tasks = tasks.map (task) ->
-  debug "inserting %s with data %j", task.name, task.data
-  job.insert task.name, task.data
-Promise.all tasks
+
+tasklist = JSON.parse(fs.readFileSync taskFile)
+tasklist = tasklist.map (tasks) ->
+  tasks.urls.forEach (url) ->
+    debug "inserting %s with data %j", tasks.name, url
+  job.insert tasks.name, tasks.urls
+Promise.all tasklist
   .then (data) ->
     debug "all task inserted"
     debug data
+    process.exit()
   .catch (err) ->
     debug err
-# process.exit()

@@ -1,14 +1,8 @@
-[
-  {
-        "name": "getCategories",
-        "data": "Heating-and-Cooling/170.pcrc"
-      },
-  {
-        "name": "getSubCategories",
-        "data": "Appliances-Housewares/Kitchen-Appliances/2010.pcrc"
-      },
-  {
-        "name": "getSubCategories",
-        "data": "Appliances-Housewares/Washers-and-Dryers/2020.pcrc"
-      }
-]
+[{
+        "name": "pcrichard",
+        "urls": [
+                "Heating-and-Cooling/170.pcrc",
+                "Appliances-Housewares/Kitchen-Appliances/2010.pcrc",
+                "Appliances-Housewares/Washers-and-Dryers/2020.pcrc"
+        ]
+}]

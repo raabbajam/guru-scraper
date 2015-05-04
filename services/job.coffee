@@ -2,12 +2,11 @@ kue = require "../libs/kue"
 Promise = require "bluebird"
 _ = require "lodash"
 insert = (taskName, taskData) ->
-  new Promise (resolve, reject) ->
-    if !_.isArray taskData
-      taskData = [taskData]
-    taskData = taskData.map (url) ->
-      kue.addTask taskName, {url: url}
-    Promise.all taskData
+  if !_.isArray taskData
+    taskData = [taskData]
+  taskData = taskData.map (url) ->
+    kue.addTask taskName, {url: url}
+  Promise.all taskData
 
 process = (task, concurrency, callback) ->
   kue.processTask task, concurrency, callback

@@ -8,7 +8,7 @@ cheerio = require 'cheerio'
 
 describe 'pcrichard store api', ->
   @timeout 100000
-  describe 'getCategories service', ->
+  describe.skip 'getCategories service', ->
     it 'should get all href', (done) ->
       options =
         url: 'Heating-and-Cooling/170.pcrc'
@@ -18,7 +18,7 @@ describe 'pcrichard store api', ->
           console.log href
           done()
         , done)
-  describe 'getSubCategories service', ->
+  describe.skip 'getSubCategories service', ->
     it 'should get all href', (done) ->
       options =
         url: 'Heating-and-Cooling/Air-Conditioners/1010.pcrc'
@@ -32,7 +32,8 @@ describe 'pcrichard store api', ->
   describe 'getProductList service', ->
     it 'should get all href', (done) ->
       options =
-        url: 'Heating-and-Cooling/Air-Conditioners/Window-Air-Conditioners/101010.pcrc'
+        url: 'TV-Video/Televisions/HDTV/301010.pcrc'
+        # url: 'Heating-and-Cooling/Air-Conditioners/Window-Air-Conditioners/101010.pcrc'
       # getProductList options
       pcrichard.get options
         .then((href) ->
@@ -40,7 +41,7 @@ describe 'pcrichard store api', ->
           done()
         , done)
 
-  describe 'getProductDetail service', ->
+  describe.skip 'getProductDetail service', ->
     it 'should request and parse', (done) ->
       options =
         url: 'Lasko/Lasko-18inch-Stand-Fan-White/1850W.pcrp?catId=101080'
