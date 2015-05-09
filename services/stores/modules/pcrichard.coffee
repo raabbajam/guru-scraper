@@ -1,7 +1,11 @@
-scraper = require '../../../libs/scraper'
 Promise = require 'bluebird'
+moment = require 'moment'
+scraper = require '../../../libs/scraper'
 urlParser = require('url').parse
 job = require '../../job'
+
+outputFormat = 'YYYY-MM-DD HH:mm:ss'
+
 scraper.mapOptions = (options) ->
   options.url = 'http://www.pcrichard.com/' + options.url.replace(/^\//, '')
 
@@ -44,6 +48,7 @@ parseNum = (text) ->
   +text.replace(/[^\.0-9]/g, '')
 
 parseDetail = ($) ->
+  date = moment().format(outputFormat)
   modelNumber = $('.pdp-sku').text().trim().replace /Model:\s/, ''
   url = $('link[rel=canonical]').attr 'href'
   urlPart = url.split '/'
@@ -82,8 +87,8 @@ parseDetail = ($) ->
   vendor_number: 'How to get this?'
   source: 'scrape'
   primary_category_id: categoryId
-  average_rating: parseNum($('.pr-review-count').text())
-  total_reviews: parseNum($('.pr-snippet-rating-decimal.pr-rounded').text())
+  average_rating: parseNum($('.pr-rating.pr-rounded.average').text())
+  total_reviews: parseNum($('.pr-review-count').text())
   original_price: parseNum($('.pdp-price ins').text())
   special_price: 'How to get this?'
   inventory_storeid: 'How to get this?'
@@ -94,12 +99,12 @@ parseDetail = ($) ->
   m1_units: 'How to get this?'
   m2: 'How to get this?'
   m2_units: 'How to get this?'
-  sem3_scrape_date: 'TODO check format'
+  sem3_scrape_date: date
   info_source: 'How to get this?'
   vendor_name: 'How to get this?'
   is_scraped: true
-  date_created: ''
-  date_updated: ''
+  date_created: date
+  date_updated: date
 
 getProductDetail = (options) ->
   scraper.get$(options)
@@ -116,11 +121,11 @@ get = (options) ->
       return getCategories options
     if number is 4
       return getSubCategories options
-    if 4 < number <= 6
+    if 4 < number <= 7
       return getProductList options
-  else
-    err = new Error('Url is not identified with any task! %s', url)
-    return Promise.reject err
+  err = new Error('Url is not identified with any task! ' + url)
+  console.log 'Url is not identified with any task! %s', url
+  return Promise.reject err
 
 pcrichard =
   get: get
